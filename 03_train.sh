@@ -55,8 +55,17 @@ echo ""
 
 mkdir -p "$ADAPTER_DIR"
 
+# ── Write LoRA config (rank is no longer a CLI arg) ──────────
+LORA_CONFIG="$ADAPTER_DIR/lora_config.yaml"
+cat > "$LORA_CONFIG" <<EOF
+lora_parameters:
+  rank: ${LORA_RANK}
+  dropout: 0.0
+  scale: 20.0
+EOF
+
 # ── Run training ──────────────────────────────────────────────
-python -m mlx_lm.lora \
+python -m mlx_lm lora \
     --model "$MODEL" \
     --data "$DATA_DIR" \
     --train \
@@ -65,11 +74,11 @@ python -m mlx_lm.lora \
     --batch-size "$BATCH_SIZE" \
     --grad-checkpoint \
     --num-layers "$LORA_LAYERS" \
-    --lora-rank "$LORA_RANK" \
     --learning-rate "$LR" \
     --steps-per-eval "$VAL_EVERY" \
     --save-every "$SAVE_EVERY" \
     --max-seq-length 4096 \
+    -c "$LORA_CONFIG" \
     2>&1 | tee "$ADAPTER_DIR/training.log"
 
 echo ""

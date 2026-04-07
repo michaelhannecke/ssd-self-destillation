@@ -228,24 +228,21 @@ def main():
     config.eval_results_path.mkdir(parents=True, exist_ok=True)
 
     # ── Import sampler ────────────────────────────────────────
-    # Reuse the generate_response from step 1 but make temp configurable
     import mlx.core as mx
     from mlx_lm import load
-    from mlx_lm.utils import generate_step
-    from importlib.machinery import SourceFileLoader
-
-    gen_module = SourceFileLoader("gen", str(Path(__file__).parent / "01_generate.py")).load_module()
+    from mlx_lm import generate as mlx_generate
+    from mlx_lm.sample_utils import make_sampler
 
     def sampler_fn(model, tokenizer, prompt, cfg, temp):
-        """Wrapper that overrides temperature."""
-        original_temp = cfg.t_train
-        cfg.t_train = temp  # Temporarily override
-        cfg.gen_top_k = cfg.eval_top_k
-        cfg.gen_top_p = cfg.eval_top_p
-        cfg.gen_max_tokens = cfg.eval_max_tokens
-        result = gen_module.generate_response(model, tokenizer, prompt, cfg)
-        cfg.t_train = original_temp
-        return result
+        """Generate one completion at a given temperature."""
+        sampler = make_sampler(temp=temp, top_p=cfg.eval_top_p)
+        return mlx_generate(
+            model, tokenizer,
+            prompt=prompt,
+            max_tokens=cfg.eval_max_tokens,
+            sampler=sampler,
+            verbose=False,
+        )
 
     # ── Load problems ─────────────────────────────────────────
     problems = load_humaneval()

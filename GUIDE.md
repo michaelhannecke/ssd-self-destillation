@@ -205,7 +205,7 @@ Iter 50: Train loss 1.301, Val loss 1.456, ...
 
 ```bash
 ls -la ./ssd_run/adapters/
-# Should show: adapters.safetensors, adapter_config.json
+# Should show: adapters.safetensors, adapter_config.json, lora_config.yaml
 ```
 
 **Common issues:**
@@ -491,6 +491,7 @@ ssd_run/
 ├── adapters/
 │   ├── adapters.safetensors   # Final LoRA weights (Step 3)
 │   ├── adapter_config.json
+│   ├── lora_config.yaml       # LoRA rank/scale/dropout config
 │   └── training.log
 └── eval_results/
     ├── eval_results.json      # pass@1, pass@5 per model (Step 4)
