@@ -115,14 +115,14 @@ def main():
     import mlx.core as mx
     from mlx_lm import load
     from mlx_lm import generate as mlx_generate
+    from mlx_lm.generate import make_sampler
 
     def sampler_fn(model, tokenizer, prompt, cfg, temp):
         return mlx_generate(
             model, tokenizer,
             prompt=prompt,
             max_tokens=cfg.eval_max_tokens,
-            temperature=temp,
-            top_p=cfg.eval_top_p,
+            sampler=make_sampler(temp=temp, top_p=cfg.eval_top_p),
             verbose=False,
         )
 
